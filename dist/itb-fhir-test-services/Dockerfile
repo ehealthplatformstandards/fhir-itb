@@ -12,6 +12,6 @@ FROM eclipse-temurin:17-jre-jammy
 RUN mkdir /app
 COPY --from=builder /app/fhir-itb-service/target/fhir-itb-service.jar /app/app.jar
 RUN sh -c 'touch /app/app.jar'
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-Xmx2048m","-jar","/app/app.jar"]
+ENTRYPOINT ["java","-Xdebug","-agentlib:jdwp=transport=dt_socket,server=y,address=*:5005,suspend=n","-Djava.security.egd=file:/dev/./urandom","-Xmx2048m","-jar","/app/app.jar"]
 EXPOSE 8181
 WORKDIR /app

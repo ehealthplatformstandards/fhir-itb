@@ -9,7 +9,7 @@ import eu.europa.ec.fhir.http.RequestParams;
 import eu.europa.ec.fhir.proxy.DeferredRequest;
 import eu.europa.ec.fhir.proxy.FhirProxyServiceHelper;
 import eu.europa.ec.fhir.proxy.FhirRefCodes;
-import eu.europa.ec.fhir.proxy.ItbRestClient;
+import eu.europa.ec.fhir.client.ItbRestClient;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

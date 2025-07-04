@@ -1,16 +1,13 @@
-package eu.europa.ec.fhir.proxy;
+package eu.europa.ec.fhir.client;
 
 import eu.europa.ec.fhir.gitb.api.model.StartSessionRequestPayload;
 import eu.europa.ec.fhir.gitb.api.model.StartSessionResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
 
 public class ItbRestClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ItbRestClient.class);
     private final RestClient restClient;
 
     public ItbRestClient(RestClient restClient) {
@@ -20,7 +17,7 @@ public class ItbRestClient {
     /**
      * Starts a test session in ITB.
      */
-    public StartSessionResponse startSession(StartSessionRequestPayload payload) throws IOException {
+    public StartSessionResponse startSession(StartSessionRequestPayload payload) {
 
         var req = restClient
                 .post()
