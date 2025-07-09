@@ -1,5 +1,6 @@
 package eu.europa.ec.fhir.client;
 
+import eu.europa.ec.fhir.gitb.api.model.TestResults;
 import org.springframework.web.client.RestClient;
 
 public class TestServerClient {
@@ -10,11 +11,11 @@ public class TestServerClient {
         this.restClient = restClient;
     }
 
-    public void sendTestReport() {
+    public void sendTestReport(TestResults testResults) {
         restClient
                 .post()
                 .uri("/test-reporting")
-                .body("payload")
+                .body(testResults)
                 .retrieve()
                 .toBodilessEntity();
     }

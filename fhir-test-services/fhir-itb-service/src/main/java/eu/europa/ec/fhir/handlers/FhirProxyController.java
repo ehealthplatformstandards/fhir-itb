@@ -77,10 +77,10 @@ public class FhirProxyController {
                 Optional.ofNullable(jsonReferenceCode.asText());
     }
 
-    private String getResourceTypeFromJson(String json, String resourceType) {
-        var referenceCodePath = this.fhirRefCodes.get(resourceType);
+    private String getResourceTypeFromJson(String json) {
+        var referenceCodePath = this.fhirRefCodes.get("resourceType");
         if (referenceCodePath.isEmpty()) {
-            LOGGER.warn("No reference code path found for resource type: {}", resourceType);
+            LOGGER.warn("No reference code path found for resource type: {}", "resourceType");
             return "";
         }
 
@@ -100,8 +100,6 @@ public class FhirProxyController {
         return jsonReferenceCode.asText();
     }
 
-    //private String get
-
     @RequestMapping({"/proxy", "/proxy/*", "/proxy/*/{id}"})
     public DeferredResult<ResponseEntity<String>> handleRequest(
             HttpServletRequest request,
@@ -111,7 +109,7 @@ public class FhirProxyController {
     ) {
 
         // Retrieving the resourceType from the json payload
-        String resourceType = payload.map(body -> getResourceTypeFromJson(body, "resourceType")).orElse("");
+        String resourceType = payload.map(body -> getResourceTypeFromJson(body)).orElse("");
 
         RequestParams proxyRequestParams = null;
         
@@ -214,11 +212,6 @@ public class FhirProxyController {
                 //          In case of failure trigger the general suite to check for issues.
                 //          No code included, method - resourceType only
                 try {
-                    String generalTestId = String.format("%s-%s",
-                            proxyRequestParams.method().toString().toLowerCase(),
-                            resourceType.replace("/", "")
-                    );
-
                     LOGGER.info("Initiating general test session(s), testId:" + testId.getKey().replaceAll("-[^-]*$", ""));
 
                     var startSessionPayload = StartSessionRequestPayload.fromRequestParams(new String[]{testId.getKey().replaceAll("-[^-]*$", "")}, testId.getValue());

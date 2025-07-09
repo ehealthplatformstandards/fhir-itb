@@ -13,7 +13,7 @@ public class TestResultService {
         this.repository = repository;
     }
 
-    public List<TestResult> getAllResults() {
-        return repository.findAll();
+    public List<TestResultEntity> findAllTestResultsByOrderByDateTimeDesc() {
+        return repository.findAllByOrderByDateTimeDesc();
     }
 }

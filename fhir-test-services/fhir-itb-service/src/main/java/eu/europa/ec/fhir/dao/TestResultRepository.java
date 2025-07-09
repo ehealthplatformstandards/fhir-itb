@@ -2,4 +2,8 @@ package eu.europa.ec.fhir.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TestResultRepository extends JpaRepository<TestResult, String> { }
+import java.util.List;
+
+public interface TestResultRepository extends JpaRepository<TestResultEntity, String> {
+    List<TestResultEntity> findAllByOrderByDateTimeDesc();
+}
