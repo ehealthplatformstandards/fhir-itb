@@ -1,6 +1,5 @@
 package eu.europa.ec.fhir.dao;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
@@ -18,7 +17,13 @@ public class TestCaseEntity {
     @ManyToMany(mappedBy = "testCases")
     private List<TestSuiteEntity> testSuites;
 
+    private String identifier;
+
     public int getId() {
         return id;
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 }

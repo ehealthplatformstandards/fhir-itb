@@ -3,6 +3,7 @@ package eu.europa.ec.fhir.handlers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.europa.ec.fhir.dao.TestCaseService;
 import eu.europa.ec.fhir.gitb.DeferredRequestMapper;
 import eu.europa.ec.fhir.gitb.api.model.StartSessionRequestPayload;
 import eu.europa.ec.fhir.http.RequestParams;
@@ -17,8 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.AbstractMap;
@@ -40,15 +41,17 @@ public class FhirProxyController {
     private final ItbRestClient itbRestClient;
     private final FhirProxyServiceHelper fhirProxyServiceHelper;
     private final DeferredRequestMapper deferredRequests;
+    private final TestCaseService testCaseService;
 
     private final FhirRefCodes fhirRefCodes;
 
-    public FhirProxyController(FhirRefCodes fhirRefCodes, ItbRestClient itbRestClient, FhirProxyServiceHelper fhirProxyServiceHelper, DeferredRequestMapper deferredRequests, RestClient restClient, ObjectMapper objectMapper) {
+    public FhirProxyController(FhirRefCodes fhirRefCodes, ItbRestClient itbRestClient, FhirProxyServiceHelper fhirProxyServiceHelper, DeferredRequestMapper deferredRequests, ObjectMapper objectMapper, TestCaseService testCaseService) {
         this.fhirRefCodes = fhirRefCodes;
         this.itbRestClient = itbRestClient;
         this.fhirProxyServiceHelper = fhirProxyServiceHelper;
         this.deferredRequests = deferredRequests;
         this.objectMapper = objectMapper;
+        this.testCaseService = testCaseService;
     }
 
     /**
@@ -105,11 +108,12 @@ public class FhirProxyController {
             HttpServletRequest request,
             //@PathVariable(value = "resourceType", required = false) String resourceType,
             @PathVariable(value = "id", required = false) Optional<String> resourceId,
+            @RequestParam(value = "testSuite") String testSuite,
             @RequestBody(required = false) Optional<String> payload
     ) {
 
         // Retrieving the resourceType from the json payload
-        String resourceType = payload.map(body -> getResourceTypeFromJson(body)).orElse("");
+        String resourceType = payload.map(this::getResourceTypeFromJson).orElse("");
 
         RequestParams proxyRequestParams = null;
         
@@ -142,7 +146,7 @@ public class FhirProxyController {
                                 JsonNode vaccineCodeNode = resourceNode.get("vaccineCode");
                                 if (vaccineCodeNode.has("coding")) {
                                     JsonNode codingArray = vaccineCodeNode.get("coding");
-                                    if (codingArray.isArray() && codingArray.size() > 0) {
+                                    if (codingArray.isArray() && !codingArray.isEmpty()) {
                                         JsonNode firstCoding = codingArray.get(0);
                                         if (firstCoding.has("code")) {
                                             vaccineCode = firstCoding.get("code").asText();
@@ -174,19 +178,12 @@ public class FhirProxyController {
 
 
         } else {
-            Optional<String> referenceCode = payload.flatMap(body -> getReferenceCode(body, resourceType));
-
             String fullPath = String.format("%s%s", resourceType, resourceId.map(value -> "/" + value).orElse(""));
             proxyRequestParams = fhirProxyServiceHelper.toFhirHttpParams(request, fullPath, payload);
-
-            testIds.add(new AbstractMap.SimpleEntry<>(String.format("%s-%s%s",
-                    proxyRequestParams.method().toString().toLowerCase(),
-                    resourceType.replace("/", ""),
-                    referenceCode.map(code -> "-" + code).orElse("")), proxyRequestParams));
+            String testCaseIdentifier = request.getMethod().toLowerCase() + "-" + testSuite;
+            String testCaseIdentifierWithVersion = testCaseIdentifier.contains("_") ? testCaseIdentifier : testCaseService.getLatestTestCaseIdentifier(testCaseIdentifier);
+            testIds.add(new AbstractMap.SimpleEntry<>(testCaseIdentifierWithVersion, proxyRequestParams));
         }
-
-
-        
 
         LOGGER.info("Starting test session(s) for \"{}\"", testIds);
         // forwards the request to the FHIR ACC server.
@@ -207,32 +204,9 @@ public class FhirProxyController {
             } catch (Exception e) {
                 LOGGER.warn("Failed to start test session(s) for testId {}: {}", testId, e.getMessage());
                 deferredRequest.resolve();
-                
-
-                //          In case of failure trigger the general suite to check for issues.
-                //          No code included, method - resourceType only
-                try {
-                    LOGGER.info("Initiating general test session(s), testId:" + testId.getKey().replaceAll("-[^-]*$", ""));
-
-                    var startSessionPayload = StartSessionRequestPayload.fromRequestParams(new String[]{testId.getKey().replaceAll("-[^-]*$", "")}, testId.getValue());
-                    var itbResponse = itbRestClient.startSession(startSessionPayload);
-                    var createdSessions = itbResponse.createdSessions();
-                    var sessionId = createdSessions[0].session();
-
-                    LOGGER.info("Test session(s) created: {}", (Object[]) createdSessions);
-                    deferredRequests.put(sessionId, deferredRequest);
-
-                } catch (Exception ec) {
-                    LOGGER.warn("Failed to start general test session(s): {}", ec.getMessage());
-                    deferredRequest.resolve();
-                }
             }
-
-            
         }
 
         return deferredResult;
-
-        
     }
 }
