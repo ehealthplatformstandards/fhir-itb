@@ -8,7 +8,7 @@
         (e.g. a "test_cases" folder for the test cases, a "scriptlets" folder for scriptlets, "resources" for files to import etc.).
     -->
     <metadata>
-        <gitb:name>FHIR Service API - AllergyIntolerance Resource</gitb:name>
+        <gitb:name>FHIR Service API - Allergy 1.0.0</gitb:name>
         <gitb:version>1.0</gitb:version>
         <gitb:description>
             Test suite for the AllergyIntolerance resource

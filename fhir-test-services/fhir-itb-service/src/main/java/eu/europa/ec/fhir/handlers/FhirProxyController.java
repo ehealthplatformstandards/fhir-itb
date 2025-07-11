@@ -122,68 +122,11 @@ public class FhirProxyController {
         LOGGER.info("Resource type from json \"{}\"", resourceType);
         List<Map.Entry<String, RequestParams>> testIds = new ArrayList<>();
 
-        if ("Bundle".equals(resourceType)) {
-
-            // loop through all entries in the bundle
-            try {
-                JsonNode root = objectMapper.readTree(payload.get());
-                JsonNode entries = root.at(this.fhirRefCodes.get("entry").get());
-                
-                if (entries.isArray()) {
-                    for (JsonNode entry : entries) {
-                        String method = "";
-                        String entryResourceType = "";
-                        String vaccineCode = "";
-                        
-                        // Get resource type for each entry
-                        JsonNode resourceNode = entry.get("resource");
-                        if (resourceNode != null && resourceNode.has("resourceType")) {
-                            entryResourceType = resourceNode.get("resourceType").asText();
-                            LOGGER.info("Found entry with resource type: {}", entryResourceType);
-                            
-                            // Get vaccine code if resource type is Immunization
-                            if (resourceNode.has("vaccineCode")) {
-                                JsonNode vaccineCodeNode = resourceNode.get("vaccineCode");
-                                if (vaccineCodeNode.has("coding")) {
-                                    JsonNode codingArray = vaccineCodeNode.get("coding");
-                                    if (codingArray.isArray() && !codingArray.isEmpty()) {
-                                        JsonNode firstCoding = codingArray.get(0);
-                                        if (firstCoding.has("code")) {
-                                            vaccineCode = firstCoding.get("code").asText();
-                                            LOGGER.info("Found vaccine code: {}", vaccineCode);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Get request method and URL for each entry
-                        JsonNode requestNode = entry.get("request");
-                        if (requestNode != null) {
-                            if (requestNode.has("method")) {
-                                method = requestNode.get("method").asText().toLowerCase();
-                                LOGGER.info("Found request method: {}", method);
-                            }
-                        }
-
-                        testIds.add(new AbstractMap.SimpleEntry<>(method + "-" + entryResourceType + "-" + vaccineCode, fhirProxyServiceHelper.toFhirHttpParams(request, "", Optional.of(resourceNode.toString()))));
-                        LOGGER.info("Test ID: {}", method + "-" + entryResourceType + "-" + vaccineCode);
-                    }
-                }
-            } catch (JsonProcessingException e) {
-                LOGGER.warn("Failed to parse Bundle entries: {}", e.getMessage());
-            }
-
-            proxyRequestParams = fhirProxyServiceHelper.toFhirHttpParams(request, "", payload);
-
-
-        } else {
-            String fullPath = String.format("%s%s", resourceType, resourceId.map(value -> "/" + value).orElse(""));
-            proxyRequestParams = fhirProxyServiceHelper.toFhirHttpParams(request, fullPath, payload);
-            String testCaseIdentifier = request.getMethod().toLowerCase() + "-" + testSuite;
-            String testCaseIdentifierWithVersion = testCaseIdentifier.contains("_") ? testCaseIdentifier : testCaseService.getLatestTestCaseIdentifier(testCaseIdentifier);
-            testIds.add(new AbstractMap.SimpleEntry<>(testCaseIdentifierWithVersion, proxyRequestParams));
-        }
+        String fullPath = String.format("%s%s", resourceType, resourceId.map(value -> "/" + value).orElse(""));
+        proxyRequestParams = fhirProxyServiceHelper.toFhirHttpParams(request, fullPath, payload);
+        String testCaseIdentifier = request.getMethod().toLowerCase() + "-" + testSuite;
+        String testCaseIdentifierWithVersion = testCaseIdentifier.contains("_") ? testCaseIdentifier : testCaseService.getLatestTestCaseIdentifier(testCaseIdentifier);
+        testIds.add(new AbstractMap.SimpleEntry<>(testCaseIdentifierWithVersion, proxyRequestParams));
 
         LOGGER.info("Starting test session(s) for \"{}\"", testIds);
         // forwards the request to the FHIR ACC server.

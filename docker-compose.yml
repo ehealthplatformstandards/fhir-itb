@@ -93,6 +93,9 @@ services:
       - "5005:5005" # debugging
     volumes:
       - ./fhir-test-services/resources:/app/resources
+    depends_on:
+      gitb-mysql:
+        condition: service_healthy
 
   mock-target-system:
     image: mockserver/mockserver
