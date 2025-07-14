@@ -11,6 +11,7 @@ import eu.europa.ec.fhir.gitb.api.model.TestSuiteSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,12 @@ public class ReportingService {
     @Autowired
     private TestServerClient testServerClient;
 
+    @Value("${TENANT_ID}")
+    private int tenantId;
+
+    @Value("${TENANT_API_KEY}")
+    private String tenantApiKey;
+
     private static final Logger log = LoggerFactory.getLogger(ReportingService.class);
 
     private String latestTestCaseTimeStamp;
@@ -53,7 +60,7 @@ public class ReportingService {
         Map<Integer, TestSuiteSummary> suiteToSummary = getTestSuiteSummaryMapBasedOnTestResults(testCasesCovered);
         addUnevaluatedTestCases(suiteToSummary, testCasesCovered);
 
-        TestResults testResults = new TestResults(1, "tenantApiKey", suiteToSummary.values());
+        TestResults testResults = new TestResults(tenantId, tenantApiKey, suiteToSummary.values());
         testServerClient.sendTestReport(testResults);
         log.info("Report sent to Test server");
         latestTestCaseTimeStamp = testResultService.findLatestTestResultTimeStamp();

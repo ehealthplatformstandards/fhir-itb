@@ -24,7 +24,7 @@ public class HandlersConfig {
     @Value("${itb.base_url}")
     private String ITB_BASE_URL;
 
-    @Value("${testServer.reporting.base_url}")
+    @Value("${TESTSERVER_BASE_URL}")
     private String TEST_SERVER_BASE_URL;
 
     @Bean
