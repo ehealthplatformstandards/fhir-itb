@@ -1,0 +1,32 @@
+[
+  {
+    "httpRequest": {
+      "path": "/Immunization",
+      "method": "POST"
+    },
+    "httpResponse": {
+      "statusCode": 201,
+      "body": "{\n  \"resourceType\": \"Immunization\",\n  \"id\": \"example\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2025-06-16T12:34:56.789Z\"\n  },\n  \"status\": \"completed\",\n  \"vaccineCode\": {\n    \"coding\": [\n      {\n        \"system\": \"http://hl7.org/fhir/sid/cvx\",\n        \"code\": \"207\",\n        \"display\": \"COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose\"\n      }\n    ]\n  },\n  \"patient\": {\n    \"reference\": \"Patient/123\"\n  },\n  \"occurrenceDateTime\": \"2025-05-01\",\n  \"primarySource\": true\n}\n"
+    }
+  },
+  {
+    "httpRequest": {
+      "path": "/AllergyIntolerance",
+      "method": "POST"
+    },
+    "httpResponse": {
+      "statusCode": 201,
+      "body": "{\n  \"resourceType\": \"AllergyIntolerance\",\n  \"id\": \"964557ca-f425-4d78-ac7b-90e4727552c5\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2025-06-16T14:45:00Z\",\n    \"profile\": [\n      \"https://www.ehealth.fgov.be/standards/fhir/allergy/StructureDefinition/be-allergyintolerance\"\n    ],\n    \"security\": [\n      {\n        \"system\": \"https://www.apps.vitalink-services.be\",\n        \"code\": \"PATIENT_HEALTH_RECORD\",\n        \"display\": \"Patient Health Record\"\n      }\n    ]\n  }\n}\n"
+    }
+  },
+  {
+    "httpRequest": {
+      "path": "/.*",
+      "method": ".*"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "{}"
+    }
+  }
+]

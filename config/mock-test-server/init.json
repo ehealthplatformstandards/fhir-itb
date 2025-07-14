@@ -1,0 +1,22 @@
+[
+  {
+    "httpRequest": {
+      "path": "/test-reporting",
+      "method": "POST"
+    },
+    "httpResponse": {
+      "statusCode": 204,
+      "body": "{}"
+    }
+  },
+  {
+    "httpRequest": {
+      "path": "/.*",
+      "method": ".*"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "{response: ok}"
+    }
+  }
+]
