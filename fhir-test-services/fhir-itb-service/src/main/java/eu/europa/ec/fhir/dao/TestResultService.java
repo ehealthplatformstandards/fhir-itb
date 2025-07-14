@@ -16,4 +16,8 @@ public class TestResultService {
     public List<TestResultEntity> findAllTestResultsByOrderByDateTimeDesc() {
         return repository.findAllByOrderByDateTimeDesc();
     }
+
+    public String findLatestTestResultTimeStamp() {
+        return repository.findLatestTestResultTimeStamp();
+    }
 }

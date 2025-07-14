@@ -11,7 +11,9 @@ import eu.europa.ec.fhir.gitb.api.model.TestSuiteSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,15 +39,32 @@ public class ReportingService {
 
     private static final Logger log = LoggerFactory.getLogger(ReportingService.class);
 
-    public void report() {
-        Set<String> testCasesCovered = new HashSet<>();
+    private String latestTestCaseTimeStamp;
 
+    @Scheduled(cron = "${testServer.reporting.cron:0 0 * * * *}")
+    @Transactional
+    public void report() {
+        if(noNewTestResultsToReport()) {
+            log.info("No new test results to report");
+            return;
+        }
+
+        Set<String> testCasesCovered = new HashSet<>();
         Map<Integer, TestSuiteSummary> suiteToSummary = getTestSuiteSummaryMapBasedOnTestResults(testCasesCovered);
         addUnevaluatedTestCases(suiteToSummary, testCasesCovered);
 
         TestResults testResults = new TestResults(1, "tenantApiKey", suiteToSummary.values());
         testServerClient.sendTestReport(testResults);
         log.info("Report sent to Test server");
+        latestTestCaseTimeStamp = testResultService.findLatestTestResultTimeStamp();
+    }
+
+    private boolean noNewTestResultsToReport() {
+        if(latestTestCaseTimeStamp == null) {
+            return false;
+        }
+        String actualLatestTestCaseTimeStamp = testResultService.findLatestTestResultTimeStamp();
+        return latestTestCaseTimeStamp.equals(actualLatestTestCaseTimeStamp);
     }
 
     private Map<Integer, TestSuiteSummary> getTestSuiteSummaryMapBasedOnTestResults(Set<String> testCasesCovered) {
