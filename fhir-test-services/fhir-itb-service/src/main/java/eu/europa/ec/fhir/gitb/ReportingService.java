@@ -6,6 +6,7 @@ import eu.europa.ec.fhir.dao.TestResultEntity;
 import eu.europa.ec.fhir.dao.TestResultService;
 import eu.europa.ec.fhir.dao.TestSuiteEntity;
 import eu.europa.ec.fhir.dao.TestSuiteService;
+import eu.europa.ec.fhir.gitb.api.model.TestCaseSummary;
 import eu.europa.ec.fhir.gitb.api.model.TestResults;
 import eu.europa.ec.fhir.gitb.api.model.TestSuiteSummary;
 import org.slf4j.Logger;
@@ -57,13 +58,13 @@ public class ReportingService {
         }
 
         Set<String> testCasesCovered = new HashSet<>();
+        latestTestCaseTimeStamp = testResultService.findLatestTestResultTimeStamp();
         Map<Integer, TestSuiteSummary> suiteToSummary = getTestSuiteSummaryMapBasedOnTestResults(testCasesCovered);
         addUnevaluatedTestCases(suiteToSummary, testCasesCovered);
 
-        TestResults testResults = new TestResults(tenantId, tenantApiKey, suiteToSummary.values());
+        TestResults testResults = new TestResults(tenantId, tenantApiKey, latestTestCaseTimeStamp, suiteToSummary.values());
         testServerClient.sendTestReport(testResults);
         log.info("Report sent to Test server");
-        latestTestCaseTimeStamp = testResultService.findLatestTestResultTimeStamp();
     }
 
     private boolean noNewTestResultsToReport() {
@@ -79,7 +80,8 @@ public class ReportingService {
         List<TestResultEntity> testResultEntities = testResultService.findAllTestResultsByOrderByDateTimeDesc();
 
         for(TestResultEntity testResultEntity : testResultEntities) {
-            String testcaseKey = testResultEntity.getTestsuite().getId() + "|" + testResultEntity.getTestcaseId();
+            TestCaseEntity testcase = testResultEntity.getTestcase();
+            String testcaseKey = testResultEntity.getTestsuite().getId() + "|" + testcase.getId();
             if(!testCasesCovered.contains(testcaseKey)) {
                 testCasesCovered.add(testcaseKey);
                 TestSuiteEntity testsuiteEntity = testResultEntity.getTestsuite();
@@ -92,6 +94,11 @@ public class ReportingService {
                 } else if (resultOutcome.equals(UNDEFINED.name())) {
                     testSuiteSummary.incrementUndefined();
                 }
+                testSuiteSummary.addTestCase(new TestCaseSummary(
+                        testcase.getIdentifier(),
+                        testcase.getName(),
+                        testResultEntity.getDateTime(),
+                        resultOutcome));
             }
         }
 
@@ -119,8 +126,6 @@ public class ReportingService {
             suiteToSummary.put(testsuiteEntity.getId(), testSuiteSummary);
             return testSuiteSummary;
         }
-        else {
-            return suiteToSummary.get(testsuiteEntity.getId());
-        }
+        return suiteToSummary.get(testsuiteEntity.getId());
     }
 }

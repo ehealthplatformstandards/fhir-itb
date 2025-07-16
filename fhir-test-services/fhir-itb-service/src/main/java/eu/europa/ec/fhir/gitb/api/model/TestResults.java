@@ -6,5 +6,6 @@ import java.util.Collection;
 public record TestResults (
         int tenantId,
         String tenantApiKey,
+        String latestTestTimeStamp,
         Collection<TestSuiteSummary> testSuiteResults
 ) implements Serializable {}

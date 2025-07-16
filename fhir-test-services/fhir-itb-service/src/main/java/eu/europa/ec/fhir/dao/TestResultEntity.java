@@ -13,8 +13,9 @@ public class TestResultEntity {
     @ManyToOne
     @JoinColumn(name = "testsuite_id")
     private TestSuiteEntity testsuite;
-    private int testcaseId;
-    private String testcase;
+    @ManyToOne
+    @JoinColumn(name = "testcase_id")
+    private TestCaseEntity testcase;
     private String result;
     @Column(name = "end_time")
     private String dateTime; // iso 8601
@@ -23,15 +24,15 @@ public class TestResultEntity {
         return testsuite;
     }
 
-    public void setTestsuite(TestSuiteEntity testsuite) {
-        this.testsuite = testsuite;
-    }
-
-    public int getTestcaseId() {
-        return testcaseId;
-    }
-
     public String getResult() {
         return result;
+    }
+
+    public TestCaseEntity getTestcase() {
+        return testcase;
+    }
+
+    public String getDateTime() {
+        return dateTime;
     }
 }

@@ -1,5 +1,6 @@
 package eu.europa.ec.fhir.dao;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
@@ -19,11 +20,18 @@ public class TestCaseEntity {
 
     private String identifier;
 
+    @Column(name = "fname")
+    private String name;
+
     public int getId() {
         return id;
     }
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    public String getName() {
+        return name;
     }
 }
