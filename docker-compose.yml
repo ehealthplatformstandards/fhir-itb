@@ -81,10 +81,12 @@ services:
       context: .
       dockerfile: dist/itb-fhir-test-services/Dockerfile
     #restart: unless-stopped
+    env_file:
+      - ./tenant-config.env
     environment:
       - itb.base_url=http://gitb-ui:9000
-      - fhir.proxy.endpoint=http://mock-target-system:8080
-      - testServer.base_url=http://mock-test-server:8081
+      - fhir.proxy.endpoint=http://mock-target-system:8080/fhir
+      #- testServer.reporting.cron=0 0 * * * * # override reporting CRON job frequency, default = every hour
       - spring.datasource.url=jdbc:mysql://gitb-mysql:3306/gitb?allowPublicKeyRetrieval=true&useSSL=false
       - spring.datasource.username=root
       - spring.datasource.password=root
@@ -93,6 +95,9 @@ services:
       - "5005:5005" # debugging
     volumes:
       - ./fhir-test-services/resources:/app/resources
+    depends_on:
+      gitb-mysql:
+        condition: service_healthy
 
   mock-target-system:
     image: mockserver/mockserver

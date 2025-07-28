@@ -18,7 +18,20 @@ public class TestCaseEntity {
     @ManyToMany(mappedBy = "testCases")
     private List<TestSuiteEntity> testSuites;
 
+    private String identifier;
+
+    @Column(name = "fname")
+    private String name;
+
     public int getId() {
         return id;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getName() {
+        return name;
     }
 }

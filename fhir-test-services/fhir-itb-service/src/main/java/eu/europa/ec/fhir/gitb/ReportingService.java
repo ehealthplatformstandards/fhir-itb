@@ -6,12 +6,16 @@ import eu.europa.ec.fhir.dao.TestResultEntity;
 import eu.europa.ec.fhir.dao.TestResultService;
 import eu.europa.ec.fhir.dao.TestSuiteEntity;
 import eu.europa.ec.fhir.dao.TestSuiteService;
+import eu.europa.ec.fhir.gitb.api.model.TestCaseSummary;
 import eu.europa.ec.fhir.gitb.api.model.TestResults;
 import eu.europa.ec.fhir.gitb.api.model.TestSuiteSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,17 +39,40 @@ public class ReportingService {
     @Autowired
     private TestServerClient testServerClient;
 
+    @Value("${TENANT_ID}")
+    private int tenantId;
+
+    @Value("${TENANT_API_KEY}")
+    private String tenantApiKey;
+
     private static final Logger log = LoggerFactory.getLogger(ReportingService.class);
 
-    public void report() {
-        Set<String> testCasesCovered = new HashSet<>();
+    private String latestTestCaseTimeStamp;
 
+    @Scheduled(cron = "${testServer.reporting.cron:0 0 * * * *}")
+    @Transactional
+    public void report() {
+        if(noNewTestResultsToReport()) {
+            log.info("No new test results to report");
+            return;
+        }
+
+        Set<String> testCasesCovered = new HashSet<>();
+        latestTestCaseTimeStamp = testResultService.findLatestTestResultTimeStamp();
         Map<Integer, TestSuiteSummary> suiteToSummary = getTestSuiteSummaryMapBasedOnTestResults(testCasesCovered);
         addUnevaluatedTestCases(suiteToSummary, testCasesCovered);
 
-        TestResults testResults = new TestResults(1, "tenantApiKey", suiteToSummary.values());
+        TestResults testResults = new TestResults(tenantId, tenantApiKey, latestTestCaseTimeStamp, suiteToSummary.values());
         testServerClient.sendTestReport(testResults);
         log.info("Report sent to Test server");
+    }
+
+    private boolean noNewTestResultsToReport() {
+        if(latestTestCaseTimeStamp == null) {
+            return false;
+        }
+        String actualLatestTestCaseTimeStamp = testResultService.findLatestTestResultTimeStamp();
+        return latestTestCaseTimeStamp.equals(actualLatestTestCaseTimeStamp);
     }
 
     private Map<Integer, TestSuiteSummary> getTestSuiteSummaryMapBasedOnTestResults(Set<String> testCasesCovered) {
@@ -53,7 +80,8 @@ public class ReportingService {
         List<TestResultEntity> testResultEntities = testResultService.findAllTestResultsByOrderByDateTimeDesc();
 
         for(TestResultEntity testResultEntity : testResultEntities) {
-            String testcaseKey = testResultEntity.getTestsuite().getId() + "|" + testResultEntity.getTestcaseId();
+            TestCaseEntity testcase = testResultEntity.getTestcase();
+            String testcaseKey = testResultEntity.getTestsuite().getId() + "|" + testcase.getId();
             if(!testCasesCovered.contains(testcaseKey)) {
                 testCasesCovered.add(testcaseKey);
                 TestSuiteEntity testsuiteEntity = testResultEntity.getTestsuite();
@@ -66,6 +94,11 @@ public class ReportingService {
                 } else if (resultOutcome.equals(UNDEFINED.name())) {
                     testSuiteSummary.incrementUndefined();
                 }
+                testSuiteSummary.addTestCase(new TestCaseSummary(
+                        testcase.getIdentifier(),
+                        testcase.getName(),
+                        testResultEntity.getDateTime(),
+                        resultOutcome));
             }
         }
 
@@ -93,8 +126,6 @@ public class ReportingService {
             suiteToSummary.put(testsuiteEntity.getId(), testSuiteSummary);
             return testSuiteSummary;
         }
-        else {
-            return suiteToSummary.get(testsuiteEntity.getId());
-        }
+        return suiteToSummary.get(testsuiteEntity.getId());
     }
 }
