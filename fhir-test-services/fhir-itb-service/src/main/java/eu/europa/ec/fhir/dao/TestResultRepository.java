@@ -8,6 +8,6 @@ import java.util.List;
 public interface TestResultRepository extends JpaRepository<TestResultEntity, String> {
     List<TestResultEntity> findAllByOrderByDateTimeDesc();
 
-    @Query("SELECT MAX(e.dateTime) FROM TestResultEntity e WHERE e.dateTime IS NOT NULL AND TRIM(e.dateTime) <> ''")
+    @Query("SELECT MAX(e.dateTime) FROM TestResultEntity e WHERE e.dateTime IS NOT NULL")
     String findLatestTestResultTimeStamp();
 }
