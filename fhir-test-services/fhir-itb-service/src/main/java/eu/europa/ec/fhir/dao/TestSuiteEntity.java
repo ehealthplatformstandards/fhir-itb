@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import java.util.List;
 
 @Entity
-@Table(name = "TestSuites")
+@Table(name = "testsuites")
 public class TestSuiteEntity {
 
     @Id
@@ -23,7 +23,7 @@ public class TestSuiteEntity {
 
     @ManyToMany
     @JoinTable(
-            name = "TestSuiteHasTestCases",
+            name = "testsuitehastestcases",
             joinColumns = @JoinColumn(name = "testsuite"),
             inverseJoinColumns = @JoinColumn(name = "testcase"))
     private List<TestCaseEntity> testCases;

@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 import java.util.List;
 
 @Entity
-@Table(name = "TestCases")
+@Table(name = "testcases")
 public class TestCaseEntity {
 
     @Id

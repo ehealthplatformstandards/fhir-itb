@@ -3,7 +3,7 @@ package eu.europa.ec.fhir.dao;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "TestResults")
+@Table(name = "testresults")
 public class TestResultEntity {
 
     @Id
