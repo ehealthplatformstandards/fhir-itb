@@ -77,7 +77,7 @@ public class ReportingService {
 
     private Map<Integer, TestSuiteSummary> getTestSuiteSummaryMapBasedOnTestResults(Set<String> testCasesCovered) {
         Map<Integer, TestSuiteSummary> suiteToSummary = new HashMap<>();
-        List<TestResultEntity> testResultEntities = testResultService.findAllTestResultsByOrderByDateTimeDesc();
+        List<TestResultEntity> testResultEntities = testResultService.findAllByTestcaseIsNotNullOrderByDateTimeDesc();
 
         for(TestResultEntity testResultEntity : testResultEntities) {
             TestCaseEntity testcase = testResultEntity.getTestcase();
