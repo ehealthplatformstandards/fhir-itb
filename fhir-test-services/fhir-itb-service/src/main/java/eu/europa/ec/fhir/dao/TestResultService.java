@@ -13,8 +13,8 @@ public class TestResultService {
         this.repository = repository;
     }
 
-    public List<TestResultEntity> findAllTestResultsByOrderByDateTimeDesc() {
-        return repository.findAllByOrderByDateTimeDesc();
+    public List<TestResultEntity> findAllByTestcaseIsNotNullOrderByDateTimeDesc() {
+        return repository.findAllByTestcaseIsNotNullOrderByDateTimeDesc();
     }
 
     public String findLatestTestResultTimeStamp() {
