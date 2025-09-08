@@ -2,12 +2,50 @@
   {
     "httpRequest": {
       "path": "/fhir/AllergyIntolerance",
+      "method": "DELETE"
+    },
+    "httpResponse": {
+      "statusCode": 204
+    }
+  },
+  {
+    "httpRequest": {
+      "path": "/fhir/AllergyIntolerance",
+      "method": "GET"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "{\n  \"resourceType\": \"AllergyIntolerance\",\n  \"id\": \"abc123\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2025-08-08T10:00:00Z\"\n  },\n  \"clinicalStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical\",\n        \"code\": \"active\"\n      }\n    ]\n  },\n  \"verificationStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-verification\",\n        \"code\": \"confirmed\"\n      }\n    ]\n  },\n  \"type\": \"allergy\",\n  \"category\": [\n    \"medication\"\n  ],\n  \"criticality\": \"high\",\n  \"code\": {\n    \"coding\": [\n      {\n        \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n        \"code\": \"7982\",\n        \"display\": \"Penicillin\"\n      }\n    ]\n  },\n  \"patient\": {\n    \"reference\": \"Patient/67890\"\n  },\n  \"recordedDate\": \"2025-08-08\"\n}"
+    }
+  },
+  {
+    "httpRequest": {
+      "path": "/fhir/AllergyIntolerance",
+      "method": "PUT"
+    },
+    "httpResponse": {
+      "statusCode": 200,
+      "body": "{\n  \"resourceType\": \"AllergyIntolerance\",\n  \"id\": \"abc123\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2025-08-08T10:00:00Z\"\n  },\n  \"clinicalStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical\",\n        \"code\": \"active\"\n      }\n    ]\n  },\n  \"verificationStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-verification\",\n        \"code\": \"confirmed\"\n      }\n    ]\n  },\n  \"type\": \"allergy\",\n  \"category\": [\n    \"medication\"\n  ],\n  \"criticality\": \"high\",\n  \"code\": {\n    \"coding\": [\n      {\n        \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n        \"code\": \"7982\",\n        \"display\": \"Penicillin\"\n      }\n    ]\n  },\n  \"patient\": {\n    \"reference\": \"Patient/67890\"\n  },\n  \"recordedDate\": \"2025-08-08\"\n}"
+    }
+  },
+  {
+    "httpRequest": {
+      "path": "/fhir/AllergyIntolerance",
       "method": "POST"
     },
     "httpResponse": {
       "statusCode": 201,
-      "body": "{\n  \"resourceType\": \"AllergyIntolerance\",\n  \"id\": \"964557ca-f425-4d78-ac7b-90e4727552c5\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2025-06-16T14:45:00Z\",\n    \"profile\": [\n      \"https://www.ehealth.fgov.be/standards/fhir/allergy/StructureDefinition/be-allergyintolerance\"\n    ],\n    \"security\": [\n      {\n        \"system\": \"https://www.apps.vitalink-services.be\",\n        \"code\": \"PATIENT_HEALTH_RECORD\",\n        \"display\": \"Patient Health Record\"\n      }\n    ]\n  }\n}\n"
+      "body": "{\n  \"resourceType\": \"AllergyIntolerance\",\n  \"id\": \"abc123\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2025-08-08T10:00:00Z\"\n  },\n  \"clinicalStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical\",\n        \"code\": \"active\"\n      }\n    ]\n  },\n  \"verificationStatus\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/allergyintolerance-verification\",\n        \"code\": \"confirmed\"\n      }\n    ]\n  },\n  \"type\": \"allergy\",\n  \"category\": [\n    \"medication\"\n  ],\n  \"criticality\": \"high\",\n  \"code\": {\n    \"coding\": [\n      {\n        \"system\": \"http://www.nlm.nih.gov/research/umls/rxnorm\",\n        \"code\": \"7982\",\n        \"display\": \"Penicillin\"\n      }\n    ]\n  },\n  \"patient\": {\n    \"reference\": \"Patient/67890\"\n  },\n  \"recordedDate\": \"2025-08-08\"\n}"
     }
+  },
+  {
+    "httpRequest": {
+      "path": "/fhir/Bundle",
+      "method": "POST"
+    },
+    "httpResponse": {
+      "statusCode": 201,
+      "body": "{\n  \"resourceType\": \"Bundle\",\n  \"id\": \"98765\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2025-08-27T12:00:00.000+00:00\"\n  },\n  \"type\": \"document\",\n  \"timestamp\": \"2025-08-27T12:00:00.000+00:00\",\n  \"link\": [\n    {\n      \"relation\": \"self\",\n      \"url\": \"https://hapi.fhir-testserver.be/fhir/1000006/Bundle/98765\"\n    }\n  ]\n}"    }
   },
   {
     "httpRequest": {

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class TestSuiteSummary implements Serializable {
-    private final String testSuiteId;
+    private final String testSuiteUid;
     private final String testSuiteName;
     private int passed;
     private int failed;
@@ -14,13 +14,13 @@ public final class TestSuiteSummary implements Serializable {
     private final List<TestCaseSummary> testCases;
 
     public TestSuiteSummary(
-            String testSuiteId,
+            String testSuiteUid,
             String testSuiteName,
             int passed,
             int failed,
             int notEvaluated
     ) {
-        this.testSuiteId = testSuiteId;
+        this.testSuiteUid = testSuiteUid;
         this.testSuiteName = testSuiteName;
         this.passed = passed;
         this.failed = failed;
@@ -28,8 +28,8 @@ public final class TestSuiteSummary implements Serializable {
         this.testCases = new ArrayList<>();
     }
 
-    public String getTestSuiteId() {
-        return testSuiteId;
+    public String getTestSuiteUid() {
+        return testSuiteUid;
     }
 
     public String getTestSuiteName() {

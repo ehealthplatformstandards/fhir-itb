@@ -86,6 +86,7 @@ services:
     environment:
       - itb.base_url=http://gitb-ui:9000
       - fhir.proxy.endpoint=http://mock-target-system:8080/fhir
+      #- fhir.proxy.endpoint=https://hapi.fhir-testserver.be/fhir/1/Patient/20760?api_key=df543944-097e-415b-a586-bab032a4e54a
       #- testServer.reporting.cron=0 0 * * * * # override reporting CRON job frequency, default = every hour
       - spring.datasource.url=jdbc:postgresql://gitb-postgresql:5432/gitb?allowPublicKeyRetrieval=true&useSSL=false
       - spring.datasource.username=gitb
@@ -118,6 +119,7 @@ services:
       MOCKSERVER_INITIALIZATION_JSON_PATH: /config/init.json
     volumes:
       - ./config/mock-test-server:/config
+      - ./test-suites/testSuiteZips.b64:/config/testSuiteZips.b64
 
 #  # Local instance of a FHIR server for testing purposes.
 #  # Point the test services' proxy to this server's endpoint.
