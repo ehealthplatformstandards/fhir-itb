@@ -113,7 +113,7 @@ public class FhirProxyController {
     ) {
 
         // Retrieving the resourceType from the json payload
-        String resourceType = payload.map(this::getResourceTypeFromJson).orElse("");
+        String resourceType = payload.map(this::getResourceTypeFromJson).orElseGet(() -> extractResourceTypeFromUri(request));
 
         RequestParams proxyRequestParams = null;
         
@@ -151,5 +151,14 @@ public class FhirProxyController {
         }
 
         return deferredResult;
+    }
+
+    private String extractResourceTypeFromUri(HttpServletRequest request) {
+        String uri = request.getRequestURI(); // e.g. /fhir/proxy/Practitioner/3
+        String[] parts = uri.split("/");         // expected: ["", "fhir", "proxy", "Practitioner", "3"]
+        if (parts.length >= 4) {
+            return parts[3];
+        }
+        return "";
     }
 }
